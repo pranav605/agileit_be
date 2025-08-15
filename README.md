@@ -38,7 +38,7 @@ JWT_SECRET=your_jwt_secret
 ```bash
 npm run dev
 ```
-
+<!-- 
 ## API Endpoints
 
 | Method | Endpoint         | Description         |
@@ -46,7 +46,7 @@ npm run dev
 | GET    | /api/items       | Get all items      |
 | POST   | /api/items       | Create new item    |
 | PUT    | /api/items/:id   | Update an item     |
-| DELETE | /api/items/:id   | Delete an item     |
+| DELETE | /api/items/:id   | Delete an item     | -->
 
 ## License
 
