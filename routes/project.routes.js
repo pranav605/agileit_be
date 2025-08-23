@@ -2,15 +2,16 @@ const express = require("express");
 const router = express.Router();
 const Project = require("../models/Project");
 const User = require("../models/User");
+const Task = require("../models/Task");
 // @route   POST /api/projects
 // @desc    Create new project
 router.post("/create", async (req, res) => {
   try {
     const { name, description, createdBy, members = [] } = req.body;
     const user = await User.findById(createdBy);
-    console.log(user.toJSON());
-
-    const allMembers = [{ user: createdBy, role: "admin" }, ...members];
+    console.log("Created BY:", user.toJSON());
+    const allMembers = [ ...members];
+    console.log("Project members: ", allMembers);
 
     const project = new Project({
       name,
@@ -27,7 +28,7 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.delete('/', async (req, res) => {
+router.delete('/delete', async (req, res) => {
   try {
     const { currentUser, projectId } = req.body;
 
@@ -46,7 +47,7 @@ router.delete('/', async (req, res) => {
     const deletedProject = await Project.findByIdAndDelete(projectId);
 
     // Optional: delete tasks belonging to this project
-    // await Task.deleteMany({ project: projectId });
+    await Task.deleteMany({ project: projectId });
 
     res.json({ message: "Project deleted successfully", project: deletedProject });
   } catch (err) {
