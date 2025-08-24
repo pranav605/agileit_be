@@ -7,7 +7,7 @@ const Task = require("../models/Task");
 router.post("/create", async (req, res) => {
   try{
     const {title, description, status, priority, dueDate, createdBy, assignedToId, project, sprint, tags} = req.body;
-    const assignedTo = await User.findById(assignedTo);
+    const assignedTo = await User.findById(assignedToId);
     console.log("Assigned To:", assignedTo.toJSON());
 
     const newTask = new Task({

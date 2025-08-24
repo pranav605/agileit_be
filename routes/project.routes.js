@@ -7,17 +7,18 @@ const Task = require("../models/Task");
 // @desc    Create new project
 router.post("/create", async (req, res) => {
   try {
-    const { name, description, createdBy, members = [] } = req.body;
+    const { name, description, createdBy, members = [], numberOfSprints } = req.body;
     const user = await User.findById(createdBy);
-    console.log("Created BY:", user.toJSON());
+    // console.log("Created BY:", user.toJSON());
     const allMembers = [ ...members];
-    console.log("Project members: ", allMembers);
+    // console.log("Project members: ", allMembers);
 
     const project = new Project({
       name,
       description,
       createdBy,
       members: allMembers,
+      numberOfSprints
     });
 
     await project.save();
@@ -28,16 +29,18 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.delete('/delete', async (req, res) => {
+router.delete('/delete/:projectId', async (req, res) => {
   try {
-    const { currentUser, projectId } = req.body;
-
+    const { currentUser } = req.query;
+    const  projectId  = req.params.projectId;
+    // console.log(currentUser, projectId)
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
-    console.log(project);
-    console.log(currentUser, project.createdBy.toString());
+    // console.log("Deleting attempt")
+    // console.log(project);
+    // console.log(currentUser, project.createdBy.toString());
     
     
     if (project.createdBy.toString() !== currentUser) {
@@ -93,7 +96,7 @@ router.get("/user/:userId", async (req, res) => {
     const projects = await Project.find({ "members.user": req.params.userId })
       .populate("createdBy", "name email")
       .populate("members.user", "name email");
-    console.log(projects);
+    // console.log(projects);
     
     res.json(projects);
   } catch (err) {
@@ -117,5 +120,19 @@ router.get('/users/search', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+router.get('/team/:projectId', async (req,res) => {
+  try{
+    const projectId = req.params.projectId;
+
+  const members = await Project.findById(projectId).populate("members.user","name email");
+  // console.log(members)
+
+  res.status(200).json(members.members);
+  } catch(err){
+    console.error(err);
+    res.status(500).json({error: "Server Error, couldn't fetch memebers"});
+  }
+})
 
 module.exports = router;
