@@ -53,4 +53,49 @@ router.get("/:taskId", (req, res) => {
   res.send(`Get task ${req.params.taskId}`);
 });
 
+//Get the tasks assigned to a user
+router.get("/getTasks/:email", async (req, res) => {
+  try{
+    const userEmail = req.params.email;
+
+    // Find the user first
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Then find tasks linked to that user
+    const tasks = await Task.find({ assignedTo: user._id });
+    if(!tasks){
+      return res.status(404).json({error: "Tasks not found for this user"});
+    }
+
+    res.status(200).send(tasks);
+  } catch (error){
+    console.error(error);
+    res.status(500).json({error: "Server error, couldn't fetch tasks"});
+  }
+})
+
+//update a task
+router.post("/update/:id", async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const changes = req.body;
+
+    // Find by ID and update, returning the new document
+    const task = await Task.findByIdAndUpdate(taskId, changes, { new: true });
+
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.status(200).json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error, could not update the task" });
+  }
+});
+
+
 module.exports = router;
