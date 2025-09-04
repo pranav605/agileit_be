@@ -49,8 +49,18 @@ router.get("/project/:projectId", async (req, res) => {
 });
 
 // Get a single task by ID
-router.get("/:taskId", (req, res) => {
-  res.send(`Get task ${req.params.taskId}`);
+router.get("/:taskId", async (req, res) => {
+  try{
+    const task = await Task.findOne({_id: req.params.taskId});
+    if(!task){
+      return res.status(404).json({error: "Task not found with this id"});
+    }
+
+    res.json(task);
+  } catch(error){
+    console.error(error);
+    res.status(500).json({error: "Server error, couldn't fetch task details"})
+  }
 });
 
 //Get the tasks assigned to a user
