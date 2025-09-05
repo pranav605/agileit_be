@@ -51,7 +51,7 @@ router.get("/project/:projectId", async (req, res) => {
 // Get a single task by ID
 router.get("/:taskId", async (req, res) => {
   try{
-    const task = await Task.findOne({_id: req.params.taskId});
+    const task = await Task.findOne({_id: req.params.taskId}).populate("assignedTo","name email");
     if(!task){
       return res.status(404).json({error: "Task not found with this id"});
     }
